@@ -1,0 +1,49 @@
+<!doctype html>
+<meta charset="UTF-8">
+<style>
+canvas {
+  border: 1px solid black;
+}
+</style>
+
+<h1>MNIST live sample app</h1>
+<canvas id="sketchpad" width="500" height="500"></canvas>
+<br>
+<button id="button">버튼</button>
+
+<script src="https://www.fiala.space/atrament.js/dist/atrament.min.js"></script>
+<script type=module>
+import * as tf from 'https://unpkg.com/@tensorflow/tfjs@3.0.0/dist/tf.fesm.min.js'
+
+// sketchpad 만들기, 브러쉬 크기 조절
+const canvas = document.getElementById('sketchpad')
+const sketchpad = new Atrament(canvas)
+sketchpad.weight = 40
+
+// 캔버스 흰색 바탕으로 채우기
+const ctx = canvas.getContext('2d')
+ctx.fillStyle = 'white'
+ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+const button = document.getElementById('button')
+
+button.addEventListener('click', async () => {
+  console.log('클릭됨!')
+  const input = tf.browser.fromPixels(canvas)
+    .resizeBilinear([28, 28])
+    .mean(2)
+    .sub(255)
+    .div(-255)
+    .reshape([1, 28, 28])
+
+  const model = await tf.loadGraphModel('/model.json')
+  console.log('모델 로드 완료, 평가 시작')
+
+  const prediction = await model.execute(input)
+  console.log('평가 완료!')
+
+  const result = tf.softmax(prediction)
+  const answer = await result.flatten().argMax().array()
+  alert(`이 숫자는 ${answer} 입니다.`)
+})
+</script>
