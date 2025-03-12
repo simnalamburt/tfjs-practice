@@ -11,14 +11,19 @@ canvas {
 <br>
 <button id="button">버튼</button>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/atrament.js/1.4.0/atrament.min.js" integrity="sha512-uFi7iEvoaiCV+sLxnXw8AHye6xWu9O3ioUzsMB8sFmf/7xaZsniwRYdsi5TZlwBiIbM/OtDnD2dzxcWzz8jn+A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script type=module>
-import * as tf from 'https://cdnjs.cloudflare.com/ajax/libs/tensorflow/3.0.0/tf.fesm.min.js'
+import Atrament from 'https://cdnjs.cloudflare.com/ajax/libs/atrament.js/4.5.0/esm/index.min.js'
+import * as tf from 'https://cdnjs.cloudflare.com/ajax/libs/tensorflow/4.22.0/tf.fesm.min.js'
 
 // sketchpad 만들기, 브러쉬 크기 조절
 const canvas = document.getElementById('sketchpad')
-const sketchpad = new Atrament(canvas)
-sketchpad.weight = 40
+const sketchpad = new Atrament(canvas, {
+  width: 500,
+  height: 500,
+  resolution: 1,
+  color: 'black',
+  weight: 10,
+})
 
 // 캔버스 흰색 바탕으로 채우기
 const ctx = canvas.getContext('2d')
