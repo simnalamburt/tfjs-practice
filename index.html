@@ -1,21 +1,40 @@
 <!doctype html>
-<meta charset="UTF-8">
+<meta charset=UTF-8>
 <style>
+body {
+  font-family: sans-serif;
+  margin: 0;
+  display: grid;
+  min-height: 100dvh;
+  place-content: center;
+  text-align: center;
+  background: #f7f7f7;
+}
+
 canvas {
-  border: 1px solid black;
+  border: 1px solid #d7d7d7;
+  border-radius: 15px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+button {
+  height: 30px;
+  border: 1px solid #a7a7a7;
+  border-radius: 15px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 </style>
 
 <h1>MNIST live sample app</h1>
-<canvas id="sketchpad" width="500" height="500"></canvas>
-<br>
-<button id="button">버튼</button>
+<canvas id=sketchpad width=500 height=500></canvas>
+<h3 id=output>&nbsp;</h3>
+<button id=reset>Reset</button>
 
 <script type=module>
 import Atrament from 'https://cdnjs.cloudflare.com/ajax/libs/atrament.js/4.5.0/esm/index.min.js'
 import * as tf from 'https://cdnjs.cloudflare.com/ajax/libs/tensorflow/4.22.0/tf.fesm.min.js'
 
-// sketchpad 만들기, 브러쉬 크기 조절
+// Initialize the sketchpad
 const canvas = document.getElementById('sketchpad')
 const sketchpad = new Atrament(canvas, {
   width: 500,
@@ -25,30 +44,33 @@ const sketchpad = new Atrament(canvas, {
   weight: 10,
 })
 
-// 캔버스 흰색 바탕으로 채우기
+// Whitefill the canvas
 const ctx = canvas.getContext('2d')
 ctx.fillStyle = 'white'
 ctx.fillRect(0, 0, canvas.width, canvas.height)
 
-const button = document.getElementById('button')
+const output = document.getElementById('output')
+sketchpad.addEventListener('strokeend', async () => {
+  output.textContent = '...'
 
-button.addEventListener('click', async () => {
-  console.log('클릭됨!')
   const input = tf.browser.fromPixels(canvas)
     .resizeBilinear([28, 28])
     .mean(2)
     .sub(255)
     .div(-255)
     .reshape([1, 28, 28])
-
   const model = await tf.loadGraphModel('/model.json')
-  console.log('모델 로드 완료, 평가 시작')
-
   const prediction = await model.execute(input)
-  console.log('평가 완료!')
-
   const result = tf.softmax(prediction)
   const answer = await result.flatten().argMax().array()
-  alert(`이 숫자는 ${answer} 입니다.`)
+
+  output.textContent = `${answer}`
+})
+
+const reset = document.getElementById('reset')
+reset.addEventListener('click', () => {
+  ctx.fillStyle = 'white'
+  ctx.fillRect(0, 0, canvas.width, canvas.height)
+  output.innerHTML = '&nbsp;'
 })
 </script>
