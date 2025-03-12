@@ -57,7 +57,9 @@ sketchpad.addEventListener('strokeend', async () => {
     .sub(255)
     .div(-255)
     .reshape([1, 28, 28])
-  const model = await tf.loadGraphModel('model.json')
+  const model = await tf.loadGraphModel('model.json', {
+    weightPathPrefix: new URL("./", globalThis.location.href).pathname,
+  })
   const prediction = await model.execute(input)
   const result = tf.softmax(prediction)
   const answer = await result.flatten().argMax().array()
