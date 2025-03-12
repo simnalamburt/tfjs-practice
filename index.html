@@ -1,5 +1,6 @@
 <!doctype html>
 <meta charset=UTF-8>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 body {
   font-family: sans-serif;
@@ -7,7 +8,7 @@ body {
   display: grid;
   min-height: 100dvh;
   place-content: center;
-  text-align: center;
+  place-items: center;
   background: #f7f7f7;
 }
 
@@ -19,6 +20,7 @@ canvas {
 
 button {
   height: 30px;
+  width: 100px;
   border: 1px solid #a7a7a7;
   border-radius: 15px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -26,7 +28,7 @@ button {
 </style>
 
 <h1>MNIST live sample app</h1>
-<canvas id=sketchpad width=500 height=500></canvas>
+<canvas id=sketchpad width=250 height=250></canvas>
 <h3 id=output>&nbsp;</h3>
 <button id=reset>Reset</button>
 
@@ -37,18 +39,14 @@ import * as tf from 'https://cdnjs.cloudflare.com/ajax/libs/tensorflow/4.22.0/tf
 // Initialize the sketchpad
 const canvas = document.getElementById('sketchpad')
 const sketchpad = new Atrament(canvas, {
-  width: 500,
-  height: 500,
+  width: 250,
+  height: 250,
   resolution: 1,
   color: 'black',
   weight: 10,
 })
 
-// Whitefill the canvas
-const ctx = canvas.getContext('2d')
-ctx.fillStyle = 'white'
-ctx.fillRect(0, 0, canvas.width, canvas.height)
-
+// Predict the drawn digit
 const output = document.getElementById('output')
 sketchpad.addEventListener('strokeend', async () => {
   output.textContent = '...'
@@ -67,10 +65,15 @@ sketchpad.addEventListener('strokeend', async () => {
   output.textContent = `${answer}`
 })
 
-const reset = document.getElementById('reset')
-reset.addEventListener('click', () => {
+// Blackfill the canvas
+const ctx = canvas.getContext('2d')
+const blackfill = () => {
   ctx.fillStyle = 'white'
   ctx.fillRect(0, 0, canvas.width, canvas.height)
   output.innerHTML = '&nbsp;'
-})
+}
+blackfill()
+
+const reset = document.getElementById('reset')
+reset.addEventListener('click', blackfill)
 </script>
